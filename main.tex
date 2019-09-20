@@ -1,0 +1,102 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\usepackage[top=2cm, bottom=4cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{appendix}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\hypersetup{%
+  colorlinks=true,
+  linkcolor=blue,
+  linkbordercolor={0 0 1}
+}
+ 
+\renewcommand\lstlistingname{Algorithm}
+\renewcommand\lstlistlistingname{Algorithms}
+\def\lstlistingautorefname{Alg.}
+
+\lstdefinestyle{Python}{
+    language        = Python,
+    frame           = lines, 
+    basicstyle      = \footnotesize,
+    keywordstyle    = \color{blue},
+    stringstyle     = \color{green},
+    commentstyle    = \color{orange}\ttfamily
+}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+
+% Edit these as appropriate
+\newcommand\course{ASTRO 372}
+\newcommand\coursename{Computational Methods for Physics}
+\newcommand\hwnumber{1}                  % <-- homework number
+\newcommand\myname{Sandra Bustamante}           % <-- NetID of person #1
+%\newcommand\NetIDb{netid12038}           % <-- NetID of person #2 (Comment this line out for problem sets)
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{\coursename\\\course}
+\chead{\textbf{\Large Homework \hwnumber}}
+\rhead{\myname \\ \today}
+\lfoot{}
+\cfoot{}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%=====================BEGIN DOCUMENT===========================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\include{problem1-1}
+\include{problem1-2}
+\include{problem1-3}
+\include{problem1-4}
+\include{problem1-5}
+
+\appendix
+
+\lstset{caption={CodeHw01-1.py}, style=Python}
+
+\section[]{Python code to solve Problem 1} 
+\label{sec:CodeHw01-1}
+\lstset{label={hw01prob1-1.py}}
+\lstinputlisting[language=Python]{code/hw01prob1-1.py}
+
+\newpage
+\section[]{Python Code to Solve Problem 2} 
+\label{sec:CodeHw01-2}
+\lstset{label={hw01prob1-2.py}}
+\lstinputlisting[language=Python]{code/hw01prob1-2.py}
+
+\newpage
+\section[]{Python Code to Solve Problem 3} 
+\label{sec:CodeHw01-3}
+\lstset{label={hw01prob1-3.py}}
+\lstinputlisting[language=Python]{code/hw01prob1-3.py}
+
+\newpage
+\section[]{Python Code to Solve Problem 4} 
+\label{sec:CodeHw01-4}
+\lstset{label={hw01prob1-4v1.py}}
+\lstinputlisting[language=Python]{code/hw01prob1-4v1.py}
+
+\newpage
+\section[]{Python Code to Solve Problem 5} 
+\label{sec:CodeHw01-5}
+\lstset{label={hw01prob1-5.py}}
+\lstinputlisting[language=Python]{code/hw01prob1-5.py}
+
+\end{document}
