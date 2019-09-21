@@ -6,7 +6,8 @@ Created on Fri Sep 13 10:11:45 2019
 
 The Monkey and The Hunter
 
-Uses Runge Kutta 4 order to solve for the velocities and positions of a bullet and a monkey in a system.
+Uses Runge Kutta 4 order to solve for the velocities and positions of a 
+bullet and a monkey in a system.
 3 conditions of shooting:
     1) Only gravity is acting on bullet.
     2) Gravity and air resistance are acting on bullet.
@@ -65,12 +66,7 @@ def FwithAir(t,u,v,vWind):
     return dvdt
 
 def FwithWind(t,u,v,vWind):
-    c=0.04
-    rho=1.204 #kg/m^3
-    r=7.2e-3 # m (7.2mm)
-    # Cross section of sphere is pi*(2r)^2 / 4
-    A=np.pi*r**2
-    dvdt=Fgravity(t,u,v,vWind)+Fair(t,u,v,vWind) + (c*rho*A*v_wind**2)/2 
+    dvdt= Fgravity(t,u,v,vWind) + Fair(t,u,v,vWind) - Fair(t,u,vWind,vWind) 
     return dvdt
 
 def calcVWind():
@@ -78,8 +74,10 @@ def calcVWind():
     Random oriented wind with random speed. 
     User have the option to fire again with same wind conditions.
     Speed is uniform distribution on range 0 - 20 m/s.
-    Direction random distribution on the uniform range [0,pi] where O is hunter to monkey, 
-        pi/2 is vertical pointing to the ground, and pi is monkey to hunter.
+    Direction random distribution on the uniform range [0,pi] 
+    where O is hunter to monkey, pi/2 is vertical pointing to the ground,
+    and pi is monkey to hunter.
+    
     Parameters: None
     Returns: v = (vx,vy)
     """
@@ -108,7 +106,8 @@ def rk4(func,told,uold,vold,vWind,h):
     return tnew,unew,vnew
 
 def rk4loop(FUNC,t,xBullet,vBullet,vWind,xMonkey,vMonkey,h,debug=False):
-    ''' Solves the equations of motion of monkey and bullet while x position of the bullet is smaller than the x position of the monkey.
+    ''' Solves the equations of motion of monkey and bullet while x position
+    of the bullet is smaller than the x position of the monkey.
     '''
     xBullet_new=np.array([0,0])
     #clear number of iterations
@@ -151,12 +150,18 @@ def doPlot(mode,xBullet,xMonkey,xCompare,t,tCompare,debug=False):
         #Set monkey on last point
         monkey = plt.imread('monkey.png')
         monkeyim = OffsetImage(monkey, zoom=.2)
-        aMonkey = AnnotationBbox(monkeyim, xMonkey[-1], xycoords='data', frameon=False)
+        aMonkey = AnnotationBbox(monkeyim,
+                                 xMonkey[-1],
+                                 xycoords='data',
+                                 frameon=False)
         ax1.add_artist(aMonkey)
         #Set golfball on last point
         golfball = plt.imread('golfball.png')
         golfballim = OffsetImage(golfball, zoom=.3)
-        aGolfball = AnnotationBbox(golfballim, xBullet[-1], xycoords='data', frameon=False)
+        aGolfball = AnnotationBbox(golfballim,
+                                   xBullet[-1],
+                                   xycoords='data',
+                                   frameon=False)
         ax1.add_artist(aGolfball)
         #Plot trajectory monkey and golfball
         ax1.plot(xBullet[:,0],xBullet[:,1],'-o')
@@ -173,25 +178,25 @@ def doPlot(mode,xBullet,xMonkey,xCompare,t,tCompare,debug=False):
     elif mode == 'gravity':
         #do plot gravity vs real
         fig1 = plt.figure(figsize=(6.9,4.9))
-        grid = plt.GridSpec(3,1, wspace=0.4, hspace=0.3)
-        ax1 = fig1.add_subplot(grid[:2,0])
-        ax1.plot(xBullet[:,0],xBullet[:,1],'-', label='Gravity Only')
-        ax1.plot(xCompare[:,0], xCompare[:,1],'-', label='Gravity and Air Resistance')
+        grid = plt.GridSpec(2,1, wspace=0.4, hspace=0.4)
+        ax1 = fig1.add_subplot(grid[0,0])
+        ax1.plot(xBullet[:,0],xBullet[:,1],'-o', label='RK4')
+        ax1.plot(xCompare[:,0], xCompare[:,1],'-o', label='Eq. Motion')
         ax1.plot(xMonkey[:,0],xMonkey[:,1],'-*')
         ax1.set_xlim(0,2100)
         ax1.set_xlabel('Distance [m]')
-        ax1.set_ylim(0,80)
+        ax1.set_ylim(0,60)
         ax1.set_ylabel('Height [m]')
         ax1.grid()
         ax1.legend()
 
-        ax2=fig1.add_subplot(grid[2,0])
+        ax2=fig1.add_subplot(grid[1,0])
         res=xPlot-xBullet
         if debug:
             print ('Residuals Shape', res.shape)
             print ('time shape: ',t.shape)
-        ax2.plot(t,res[:,0],'o',label='Residuals in x direction')
-        ax2.plot(t,res[:,1],'o',label='Residuals in y direction')
+        ax2.plot(t,res[:,0],'o',label='x direction')
+        ax2.plot(t,res[:,1],'o',label='y direction')
         ax2.set_xlim(0,t.max()*1.1)
         ax2.set_xlabel('Time [s]')
         ax2.set_ylim(res.min()*1.1,res.max()*1.1)
@@ -201,7 +206,7 @@ def doPlot(mode,xBullet,xMonkey,xCompare,t,tCompare,debug=False):
         
         
     elif mode == 'airdrag':
-        #do plot air drag, gravity and real
+        #do plot air drag, gravity
         fig1 = plt.figure(figsize=(6.9,7.2))
         grid = plt.GridSpec(3,1, wspace=0.4, hspace=0.4)
         ax1 = fig1.add_subplot(grid[0,0])
@@ -237,13 +242,38 @@ def doPlot(mode,xBullet,xMonkey,xCompare,t,tCompare,debug=False):
         
     elif mode == 'wind':
         #do plot wind vs airdrag vs gravity vs real
-        fig1 = plt.figure(figsize=(6.9,4.9))
-        ax1 = fig1.add_subplot(111)
-        ax1.plot(xBulletPlot[:,0],xBulletPlot[:,1],'-o')
-        ax1.plot(xMonkeyPlot[:,0],xMonkeyPlot[:,1],'-*')
+        fig1 = plt.figure(figsize=(6.9,7.2))
+        grid = plt.GridSpec(3,1, wspace=0.4, hspace=0.4)
+        ax1 = fig1.add_subplot(grid[0,0])
+        ax1.plot(xBullet[:,0],xBullet[:,1],'-o', label='with Wind')
+        ax1.plot(xCompare[:11,0], xCompare[:11,1],'-o', label='with Air')
+        ax1.plot(xMonkey[:,0],xMonkey[:,1],'-*')
         ax1.set_xlim(0,2100)
-        ax1.set_ylim(0,80)
+        ax1.set_xlabel('Distance [m]')
+        ax1.set_ylim(0,xBullet[:,1].max()*1.2)
+        ax1.set_ylabel('Height [m]')
         ax1.grid()
+        ax1.legend()
+
+        ax2=fig1.add_subplot(grid[1,0])
+        ax2.plot(t,xBullet[:,1],'-o',label='With Wind')
+        ax2.plot(tCompare[:11],xCompare[:11,1],'-o',label='with Air')
+        #ax2.set_xlim(0,t.max()*1.1)
+        #ax2.set_xlabel('Time [s]')
+        ax2.set_ylim(0,xBullet[:,1].max()*1.2)
+        ax2.set_ylabel('Y Position [m]')
+        ax2.grid()
+        ax2.legend()
+        
+        ax3=fig1.add_subplot(grid[2,0],sharex=ax2)
+        ax3.plot(t,xBullet[:,0],'-o',label='With Wind')
+        ax3.plot(tCompare[:11],xCompare[:11,0],'-o',label='With Air')
+        ax3.set_xlim(0,t.max()*1.1)
+        ax3.set_xlabel('Time [s]')
+        ax3.set_ylim(0,xBullet[:,0].max()*1.1)
+        ax3.set_ylabel('X Position [m]')
+        ax3.grid()
+        ax3.legend()
         
     else:
         print("There's no plot for you (u.u)")
@@ -279,7 +309,7 @@ def hitMiss(h,xMonkey,xBullet):
         elif repeat == 'n':
             repeat=False
         else:
-            print('not one of the option but still will end game. Thanks for playing.')
+            print('Not one of the options but still will end game.')
             time.sleep(2)
             repeat=False
     else:
@@ -308,8 +338,7 @@ def initialize(x0bullet,v0bullet,x0monkey,v0monkey,tf):
 
 #Programmer Interaction
 #=============================================================
-mode='airdrag' #'story', 'gravity', 'airdrag', 'wind'
-showPlot=True
+mode='wind' #'story', 'gravity', 'airdrag', 'wind'
 h=.0001 #s, step size in time
 tf=int(4/h) #trial and error. The outmost it will take to arrive to the other side.
 debug=True #Prints several values along the code to help in debugging
@@ -360,7 +389,8 @@ if mode == 'story':
         direction=direction*180/np.pi #converts it into degrees
         if debug:
             print('The forces acting on bullet is gravity, air resistance and wind.')
-        print('Oh no! The wind is blowing at %s m/s with direction %s deg /n'%(speed,direction))
+        print('Oh no! The wind is blowing at %s m/s with direction %s deg /n'
+              %(speed,direction))
 
     ####################################################################
     #Initializes the vectors with initial positions
@@ -388,12 +418,20 @@ if mode == 'story':
         time.sleep(.5)
         print('SHOOT! \n')
     
-        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,v0bullet,x0monkey,v0monkey,tf)
+        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,
+                                                     v0bullet,
+                                                     x0monkey,
+                                                     v0monkey,
+                                                     tf)
         
         ################################################################
         #Solves for the position of the monkey and hunter using RK4
         ################################################################
-        xBullet,xMonkey,n=rk4loop(FUNC,t,xBullet,vBullet,v_wind,xMonkey,vMonkey,h)
+        xBullet,xMonkey,n=rk4loop(FUNC,t,
+                                  xBullet,vBullet,
+                                  v_wind,
+                                  xMonkey,vMonkey,
+                                  h)
         
         if debug:
             print ('Bullet')
@@ -404,7 +442,8 @@ if mode == 'story':
     
         ################################################################
         # Plot
-        # To reduce computing time just calculate points points between start and stop.
+        # To reduce computing time just calculate points points between
+        # start and stop.
         ################################################################
         points=20
         xBulletPlot=xBullet[0:n:int(n/points)]
@@ -415,7 +454,7 @@ if mode == 'story':
         np.append(xMonkeyPlot,xMonkey[n].reshape(1,2),axis=0)
         np.append(tPlot,t[n])
         
-        fig1,ax1,ax2= doPlot(mode,xBulletPlot,xMonkeyPlot,0,tPlot)    
+        fig1,ax1,ax2= doPlot(mode,xBulletPlot,xMonkeyPlot,0,tPlot,tPlot)    
         fig1.tight_layout()
         plt.show()
         
@@ -434,9 +473,9 @@ elif mode == 'gravity':
     v0bullet=1100  #m/s
     x0bullet=np.array([0.,0.])
     v0monkey=np.array([0.,0.]) #m/s
-    x0random=np.random.uniform(0,100)
+    x0random=np.random.uniform(-100,100)
     x0=2000. + x0random
-    y0random=np.random.uniform(0,20)
+    y0random=np.random.uniform(-20,20)
     y0=60. + y0random
     x0monkey=np.array([x0,y0])
     repeat=True
@@ -447,11 +486,13 @@ elif mode == 'gravity':
         theta = np.float32(input('Select your shooting angle in degrees. '))
         theta = theta*np.pi/180.
         
-        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,v0bullet,x0monkey,v0monkey,tf)
+        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,v0bullet,
+                                                     x0monkey,v0monkey,tf)
         if debug:
-            print('x0Monkey',xMonkey[0])
+            print('Monkey Initial Position',xMonkey[0])
             
-        xBullet,xMonkey,n=rk4loop(Fgravity,t,xBullet,vBullet,v_wind,xMonkey,vMonkey,h)
+        xBullet,xMonkey,n=rk4loop(Fgravity,t,xBullet,vBullet,v_wind,
+                                  xMonkey,vMonkey,h)
         
         points=20
         xBulletPlot=xBullet[0:n:int(n/points)]
@@ -465,9 +506,13 @@ elif mode == 'gravity':
         v0=vBullet[0]    
         xPlot=calcReal(points,xBulletPlot,tPlot,v0)
         
-        fig1,ax1,ax2= doPlot(mode,xBulletPlot,xMonkeyPlot,xPlot,tPlot)
+        fig1,ax1,ax2= doPlot(mode,xBulletPlot,xMonkeyPlot,xPlot,tPlot,tPlot)
+        save=input('savefig?')
+        if save=='y':
+            fname=input('fname?')
+            plt.savefig(fname,dpi=600)
         plt.show()
-        
+      
         repeat,x0monkey=hitMiss(h,xMonkey,xBullet)
     
 
@@ -492,11 +537,38 @@ elif mode == 'airdrag':
         theta = np.float32(input('Select your shooting angle in degrees. '))
         theta = theta*np.pi/180.
         
-        xBulletG,vBulletG,xMonkeyG,vMonkeyG,tG=initialize(x0bullet,v0bullet,x0monkey,v0monkey,tf)        
-        xGravity,xMonkey,nG=rk4loop(Fgravity,tG,xBulletG,vBulletG,v_wind,xMonkeyG,vMonkeyG,h,debug)
+        xBulletG,vBulletG,xMonkeyG,vMonkeyG,tG=initialize(x0bullet,
+                                                          v0bullet,
+                                                          x0monkey,
+                                                          v0monkey,
+                                                          tf)
+        if debug:
+            print('Monkey Initial Position',xMonkeyG[0])
+            
+        xGravity,xMonkey,nG=rk4loop(Fgravity,
+                                    tG,
+                                    xBulletG,
+                                    vBulletG,
+                                    v_wind,
+                                    xMonkeyG,
+                                    vMonkeyG,
+                                    h,
+                                    debug)
         
-        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,v0bullet,x0monkey,v0monkey,tf)
-        xBullet,xMonkey,n=rk4loop(FwithAir,t,xBullet,vBullet,v_wind,xMonkey,vMonkey,h,debug)
+        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,
+                                                     v0bullet,
+                                                     x0monkey,
+                                                     v0monkey,
+                                                     tf)
+        xBullet,xMonkey,n=rk4loop(FwithAir,
+                                  t,
+                                  xBullet,
+                                  vBullet,
+                                  v_wind,
+                                  xMonkey,
+                                  vMonkey,
+                                  h,
+                                  debug)
 
         
         points=20
@@ -520,15 +592,88 @@ elif mode == 'airdrag':
                              tPlot,
                              tPlotG,
                              debug)
+        save=input('savefig?')
+        if save=='y':
+            fname=input('fname?')
+            plt.savefig(fname,dpi=600)
         plt.show()
         
         repeat,x0monkey=hitMiss(h,xMonkey,xBullet)
         
 elif mode == 'wind':
-    FUNC=FwithWind
     v_wind,speed,direction=calcVWind()
     if debug:
         print('The forces acting on bullet is gravity, air resistance and wind.')
+    
+    while repeat:
+        
+        theta = np.float32(input('Select your shooting angle in degrees. '))
+        theta = theta*np.pi/180.
+        
+        xBulletAir,vBulletAir,xMonkeyAir,vMonkeyAir,tAir=initialize(x0bullet,
+                                                          v0bullet,
+                                                          x0monkey,
+                                                          v0monkey,
+                                                          tf)
+        if debug:
+            print('Monkey Initial Position',xMonkeyAir[0])
+            
+        xAir,xMonkey,nAir=rk4loop(FwithAir,
+                                    tAir,
+                                    xBulletAir,
+                                    vBulletAir,
+                                    v_wind,
+                                    xMonkeyAir,
+                                    vMonkeyAir,
+                                    h,
+                                    debug)
+        
+        xBullet,vBullet,xMonkey,vMonkey,t=initialize(x0bullet,
+                                                     v0bullet,
+                                                     x0monkey,
+                                                     v0monkey,
+                                                     tf)
+        xBullet,xMonkey,n=rk4loop(FwithWind,
+                                  t,
+                                  xBullet,
+                                  vBullet,
+                                  v_wind,
+                                  xMonkey,
+                                  vMonkey,
+                                  h,
+                                  debug)
+        
+
+        
+        points=20
+        xBulletPlot=xBullet[0:n:int(n/points)]
+        xMonkeyPlot=xMonkey[0:n:int(n/points)]
+        tPlot=t[0:n:int(n/points)]
+        xAirPlot=xAir[0:n:int(n/points)]
+        tPlotAir=tAir[0:n:int(n/points)]
+        #Add last point calculated by RK4
+        np.append(xBulletPlot,xBullet[n].reshape(1,2),axis=0)
+        np.append(xMonkeyPlot,xMonkey[n].reshape(1,2),axis=0)
+        np.append(xAirPlot,xAir[n].reshape(1,2),axis=0)
+        np.append(tPlot,t[n])
+        np.append(tPlotAir,tAir[n])
+        
+        
+        fig1,ax1,ax2= doPlot(mode,
+                             xBulletPlot,
+                             xMonkeyPlot,
+                             xAirPlot,
+                             tPlot,
+                             tPlotAir,
+                             debug)
+        save=input('savefig?')
+        if save=='y':
+            fname=input('fname?')
+            plt.savefig(fname,dpi=600)
+        plt.show()
+        
+        repeat,x0monkey=hitMiss(h,xMonkey,xBullet)
+    
 
 else:
     print('No mode selected')
