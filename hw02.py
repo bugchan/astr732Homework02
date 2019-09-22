@@ -308,7 +308,7 @@ def initialize(x0bullet,v0bullet,x0monkey,v0monkey,tf):
 
 #Programmer Interaction
 #=============================================================
-mode='airdrag' #'story', 'gravity', 'airdrag', 'wind'
+mode='gravity' #'story', 'gravity', 'airdrag', 'wind'
 showPlot=True
 h=.0001 #s, step size in time
 tf=int(4/h) #trial and error. The outmost it will take to arrive to the other side.
@@ -465,7 +465,7 @@ elif mode == 'gravity':
         v0=vBullet[0]    
         xPlot=calcReal(points,xBulletPlot,tPlot,v0)
         
-        fig1,ax1,ax2= doPlot(mode,xBulletPlot,xMonkeyPlot,xPlot,tPlot)
+        fig1,ax1,ax2= doPlot(mode,xBulletPlot,xMonkeyPlot,xPlot,tPlot,tPlot)
         plt.show()
         
         repeat,x0monkey=hitMiss(h,xMonkey,xBullet)
